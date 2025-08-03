@@ -1,9 +1,4 @@
 #!/usr/bin/env python3
-"""
-Wazuh SOCFortress Configuration Script
-Configures Wazuh with SOCFortress ruleset
-"""
-
 import os
 import sys
 import argparse
@@ -83,8 +78,12 @@ class WazuhConfigurator:
     def restart_service(self, service_name):
         """Restart service with appropriate method"""
         try:
-            # Try systemctl first
-            if shutil.which('systemctl'):
+            # Try Wazuh control script first
+            if os.path.exists('/var/ossec/bin/wazuh-control'):
+                self.logger(f"Restarting {service_name} using wazuh-control...")
+                self.run_command("/var/ossec/bin/wazuh-control restart")
+            # Try systemctl
+            elif shutil.which('systemctl'):
                 self.logger(f"Restarting {service_name} using systemd...")
                 self.run_command(f"systemctl restart {service_name}.service")
             # Try service command
@@ -170,7 +169,6 @@ class WazuhConfigurator:
                 return False
             else:
                 self.logger("Wazuh-Manager Service is healthy. Thanks for checking us out :)")
-                self.logger("Get started with our free-for-life tier here: https://www.socfortress.co/trial.html Happy Defending!")
                 shutil.rmtree('/tmp/Wazuh-Rules', ignore_errors=True)
                 return True
                 
@@ -290,7 +288,7 @@ class WazuhConfigurator:
             if os.path.exists('/tmp/Wazuh-Rules'):
                 shutil.rmtree('/tmp/Wazuh-Rules')
                 
-            self.run_command("git clone https://github.com/socfortress/Wazuh-Rules.git /tmp/Wazuh-Rules")
+            self.run_command("git clone https://github.com/haekal-alg/wazuh-management-script.git /tmp/Wazuh-Rules")
             
             # Move files from repository to appropriate directories
             if not self.move_repo_files('/tmp/Wazuh-Rules'):
