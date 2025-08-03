@@ -1,1 +1,0 @@
-#zeek rules

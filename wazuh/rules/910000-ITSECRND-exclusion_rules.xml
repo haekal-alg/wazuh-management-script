@@ -1,0 +1,45 @@
+<group name="itsec_rule_exclusion,">
+  
+  <!-- filters out application that's commonly used by user -->
+  <rule id="910095" level="1">
+    <if_sid>60107</if_sid>
+    <field name="win.eventdata.processName" type="pcre2"> (?i)^C:\\\\Program Files \(x86\)\\\\Microsoft\\\\EdgeWebView\\\\Application\\\\\d+\.\d+\.\d+\.\d+\\\\msedgewebview2\.exe$|(?i)^C:\\\\Program Files\\\\Google\\\\Chrome\\\\Application\\\\chrome\.exe$|(?i)^C:\\\\Program Files \(x86\)\\\\Microsoft\\\\Edge\\\\Application\\\\msedge\.exe$|(?i)^C:\\\\Program Files\\\\Common Files\\\\Adobe\\\\Adobe Desktop Common\\\\HEX\\\\Creative Cloud UI Helper\.exe$|(?i)^C:\\\\Program Files\\\\Microsoft OneDrive\\\\OneDrive\.exe$|(?i)^C:\\\\Program Files \(x86\)\\\\Logitech\\\\LogiTune\\\\LogiTune\.exe$|(?i)^C:\\\\Windows\\\\System32\\\\RuntimeBroker\.exe$|(?i)^C:\\\\Program Files\\\\Adobe\\\\Adobe Creative Cloud\\\\ACC\\\\Creative Cloud\.exe$|(?i)^C:\\\\Program Files\\\\Intuit\\\\QuickBooks 2024\\\\CefSharp\.BrowserSubprocess\.exe$|(?i)^C:\\\\Users\\\\[^\\]+\\\\AppData\\\\Local\\\\Programs\\\\gather-electron\\\\Gather\.exe$|(?i)^C:\\\\Users\\\\[^\\]+\\\\AppData\\\\Local\\\\Programs\\\\podman-desktop\\\\Podman Desktop\.exe$|(?i)^C:\\\\Users\\\\[^\\]+\\\\AppData\\\\Local\\\\Programs\\\\Perplexity\\\\Perplexity\.exe$|(?i)^C:\\\\Users\\\\[^\\]+\\\\AppData\\\\Local\\\\AnthropicClaude\\\\app-\d+\.\d+\.\d+\\\\claude\.exe$|(?i)^C:\\\\Program Files\\\\RedHat\\\\Podman\\\\podman\.exe$|(?i)^C:\\\\Users\\\\[^\\]+\\\\AppData\\\\Local\\\\Obsidian\\\\Obsidian\.exe$|(?i)^C:\\\\Users\\\\[^\\]+\\\\AppData\\\\Local\\\\Programs\\\\Microsoft VS Code\\\\Code\.exe$|(?i)^C:\\\\Users\\\\[^\\]+\\\\AppData\\\\Local\\\\Programs\\\\Termius\\\\Termius\.exe$ </field>
+	  <description>Exclusion: Failed attempt for privileged Operation.</description>
+    <options>no_full_log</options>
+  </rule>
+
+  <!-- PSScriptPolicyTest is an on-the-fly script that checks if it's running on a system with AppLocker enabled. Normal powershell behaviour -->
+  <!-- https://groups.google.com/g/wazuh/c/W4TqhgS0fM0 -->
+  <rule id="910096" level="1">
+    <if_sid>900030</if_sid>
+    <field name="win.eventdata.image" type="pcre2">(?i)__PSScriptPolicyTest_\w{8}.\w{3}.ps1$</field>
+    <description>Exclusion: Executable file dropped in folder commonly used by malware (PSScriptPolicyTest).</description>
+    <options>no_full_log</options>
+  </rule>
+
+  <!-- TacticalRMM uses base64 encoded command to install or upgrade its functionality -->
+  <!-- Enable this if TacticalRMM is a commonly used application in the environment -->
+  <rule id="910098" level="1">
+    <if_sid>92057</if_sid>
+    <field name="win.eventdata.parentCommandLine" type="pcre2">(?i)C:\\\\ProgramData\\\\TacticalRMM\\\\(\d+\.ps1)$</field>
+    <description>Exclusion: TacticalRMM executing Base64 Command from PowerShell</description>
+    <options>no_full_log</options>
+  </rule>
+
+  <!-- Sys admin or programming tools usually spawn non-interactive shells -->
+  <rule id="910097" level="1">
+    <if_sid>100503</if_sid>
+     <field name="win.eventdata.parentImage" type="pcre2">(?i)^C:\\\\Users\\\\[^\\]+\\\\AppData\\\\Local\\\\Programs\\\\podman-desktop\\\\Podman Desktop\.exe</field>
+    <description>Exclusion: Non Interactive PowerShell Execution detected from $(win.eventdata.parentImage)</description>
+    <options>no_full_log</options>
+  </rule>
+
+  <!-- https://help.fortinet.com/fsiem/Public_Resource_Access/7_1_1/rules/PH_RULE_Credentials_Dumping_Tools_Accessing_LSASS_Memory.htm -->
+  <rule id="910099" level="1">
+    <if_sid>92900</if_sid>
+     <field name="win.eventdata.sourceImage" type="pcre2">(?i)^C:\\\\ProgramData\\\\Microsoft\\\\Windows Defender\\\\Platform\\\\[^\\]+\\\\MsMpEng\.exe$</field>
+    <description>Exclusion: LSASS was accessed by Microsoft Defender</description>
+    <options>no_full_log</options>
+  </rule>v
+
+</group>

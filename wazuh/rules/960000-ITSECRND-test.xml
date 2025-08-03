@@ -1,0 +1,11 @@
+<group name="test,">
+    <!-- [System.Text.Encoding]::UTF8.GetString([Convert]::FromBase64String("aGVsbG8gZnJvbSBpdHNlYyBybmQh")) -->
+
+    <rule id="960001" level="15">
+        <if_group>sysmon_event1</if_group>
+
+        <field name="win.eventdata.commandLine" type="pcre2" nocase="1">aGVsbG8gZnJvbSBpdHNlYyBybmQh</field>
+        <description>[TEST] Hello from ITSEC RND!</description>
+    </rule>
+
+</group>

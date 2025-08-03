@@ -1,0 +1,9 @@
+<decoder name="falco">
+  <program_name>^Falco$</program_name>
+</decoder>
+
+<decoder name="falcojson">
+  <parent>falco</parent>
+  <prematch>json_data: </prematch>
+  <plugin_decoder offset="after_prematch">JSON_Decoder</plugin_decoder>
+</decoder>

@@ -1,0 +1,1 @@
+1. https://github.com/socfortress/Wazuh-Rules/tree/main

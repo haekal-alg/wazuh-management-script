@@ -1,0 +1,110 @@
+<group name="sigma,">
+
+    <rule id="950001" level="15">
+        <if_group>sysmon_event1</if_group>
+
+        <field name="win.eventdata.image" type="pcre2" nocase="1">\\Rubeus\.exe$</field>
+        <field name="win.eventdata.originalFileName" nocase="1">Rubeus.exe</field>
+        <field name="win.eventdata.description" nocase="1">Rubeus</field>
+        
+        <field name="win.eventdata.commandLine" type="pcre2" nocase="1">(asreproast |dump /service:krbtgt |dump /luid:0x |kerberoast |createnetonly /program: |ptt /ticket: |/impersonateuser: |renew /ticket: |asktgt /user:|harvest /interval:|s4u /ticket:|s4u /user:|hash /password:|golden /aes256:|silver /user:)</field>
+        
+        <description>Hacktool Rubeus execution detected. (Sigma ID: 7ec2c172-dceb-4c10-92c9-87c1881b7e18)</description>
+        <info type="link">https://github.com/GhostPack/Rubeus</info>
+        <info type="link">https://blog.harmj0y.net/redteaming/from-kekeo-to-rubeus</info>
+        <info type="link">https://m0chan.github.io/2019/07/31/How-To-Attack-Kerberos-101.html</info>
+        <mitre>
+            <id>T1003</id>
+            <id>T1558.003</id>
+            <id>T1550.003</id>
+        </mitre>
+    </rule>
+    
+    <rule id="950002" level="15">
+        <if_group>sysmon_event1</if_group>
+        
+        <field name="win.eventdata.commandLine" type="pcre2" nocase="1">-NoP -NonI (-w Hidden -c \$x=\$\(\(gp HKCU:Software\\Microsoft\\Windows Update\)\.Update\) |-c \$x=\$\(\(gp HKCU:Software\\Microsoft\\Windows Update\)\.Update\);)</field>
+        
+        <description>Potential Empire PowerShell UAC Bypass detected. (Sigma ID: 3268b746-88d8-4cd3-bffc-30077d02c787)</description>
+        <info type="link">https://github.com/EmpireProject/Empire/blob/e37fb2eef8ff8f5a0a689f1589f424906fe13055/data/module_source/privesc/Invoke-EventVwrBypass.ps1#L64</info>
+        <info type="link">https://github.com/EmpireProject/Empire/blob/e37fb2eef8ff8f5a0a689f1589f424906fe13055/data/module_source/privesc/Invoke-FodHelperBypass.ps1#L64</info>
+        <mitre>
+          <id>T1548.002</id>
+        </mitre>
+        <group>sysmon_event1,pci_dss_10.2.7,pci_dss_11.5,nist_800_53_SI.4,hipaa_164.312.b,tsc_CC6.8,tsc_CC7.2,</group>
+  </rule>
+  
+  <rule id="950003" level="15">
+    <if_group>sysmon_event1</if_group>
+    
+    <field name="win.eventdata.company" nocase="1">SecurityXploded</field>
+    <field name="win.eventdata.image" type="pcre2" nocase="1">PasswordDump\.exe$</field>
+    <field name="win.eventdata.originalFileName" type="pcre2" nocase="1">PasswordDump\.exe$</field>
+    
+    <description>Potential Hacktool 'SecurityXploded' Execution Detected. (Sigma ID: 7679d464-4f74-45e2-9e01-ac66c5eb041a)</description>
+    <info type="link">https://securityxploded.com/</info>
+    <info type="link">https://web.archive.org/web/20200601000524/https://cyberx-labs.com/blog/gangnam-industrial-style-apt-campaign-targets-korean-industrial-companies/</info>
+    <mitre>
+      <id>T1555</id>
+    </mitre>
+  </rule>
+  
+  <rule id="950004" level="15">
+    <if_group>sysmon_event1</if_group>
+    
+    <!-- Detect hidden or double-extension executables -->
+    <field name="win.eventdata.image" type="pcre2" nocase="1">(\s{3,}\.exe|_{3,}\.exe|\.(docx?|gif|jpe?g|mkv|mov|mp[34]|pdf|png|pptx?|rtf|svg|txt|xlsx?)\.(exe|js))$</field>
+    <field name="win.eventdata.commandLine" type="pcre2" nocase="1">(\s{3,}\.exe|_{3,}\.exe|\.(docx?|gif|jpe?g|mkv|mov|mp[34]|pdf|png|pptx?|rtf|svg|txt|xlsx?)\.(exe|js))</field>
+    
+    <description>Suspicious double extension or cloaked file execution detected: ${win.eventdata.image}. (Sigma ID: 1cdd9a09-06c9-4769-99ff-626e2b3991b8)</description>
+    <info type="link">https://blu3-team.blogspot.com/2019/06/misleading-extensions-xlsexe-docexe.html</info>
+    <info type="link">https://twitter.com/blackorbird/status/1140519090961825792</info>
+    <info type="link">https://cloud.google.com/blog/topics/threat-intelligence/cybercriminals-weaponize-fake-ai-websites</info>
+    <mitre>
+      <id>T1566.001</id>
+    </mitre>
+  </rule>
+  
+  <rule id="950005" level="15">
+    <if_sid>60102,60102</if_sid>
+    
+    <field name="win.system.message" nocase="1">kali|mimikatz</field>
+    
+    <description>Potential Zerologon (CVE-2020-1472) exploitation attempt detected. (Sigma ID: 18f37338-b9bd-4117-a039-280c81f7a596)</description>
+    <info type="cve">CVE-2020-1472</info>
+    <info type="link">https://www.secura.com/blog/zero-logon</info>
+    <info type="link">https://bi-zone.medium.com/hunting-for-zerologon-f65c61586382</info>
+    <mitre>
+      <id>T1210</id>
+    </mitre>
+  </rule>
+  
+  <!-- https://www.microsoft.com/en-us/wdsi/threats/threat-search -->
+  <rule id="950006" level="15">
+    <if_sid>83000</if_sid> 
+    
+    <field name="defender.name" nocase="1">Backdoor\.Cobalt|Brutel|BruteR|CobaltStr|CobaltStrike|COBEACON|Cometer|Exploit\.Script\.CVE|IISExchgSpawnCMD|Metasploit|Meterpreter|MeteTool|Mpreter|MsfShell|PowerSploit|Razy|Rozena|Sbelt|Seatbelt|Sliver|Swrort</field>
+    
+    <description>Antivirus detected a known exploitation framework. Immediate investigation required. (Sigma ID: 238527ad-3c2c-4e4f-a1f6-92fd63adb864)</description>
+    <info type="link">https://www.nextron-systems.com/?s=antivirus</info>
+    <mitre>
+      <id>T1203</id>
+      <id>T1219.002</id>
+    </mitre>
+  </rule>
+  
+  <rule id="950007" level="15">
+     <if_sid>83000</if_sid>
+     <field name="defender.name" nocase="1">^PWS|Certify|DCSync|DumpCreds|DumpLsass|DumpPert|HTool/WCE|Kekeo|Lazagne|LsassDump|Mimikatz|MultiDump|Nanodump|NativeDump|Outflank|PShlSpy|PSWTool|PWCrack|PWDump|PWS\.|PWSX|pypykatz|Rubeus|SafetyKatz|SecurityTool|SharpChrome|SharpDPAPI|SharpDump|SharpKatz|SharpS\.|ShpKatz|TrickDump</field>
+
+    <description>Antivirus detected a known password dumper. Immediate investigation required. (Sigma ID: 78cc2dd2-7d20-4d32-93ff-057084c38b93)</description>
+    <info type="link">https://www.nextron-systems.com/?s=antivirus</info>
+    <mitre>
+      <id>T1003</id>
+      <id>T1003.001</id>
+      <id>T1003.002</id>
+      <id>T1558</id>
+    </mitre>
+  </rule>
+  
+</group>
