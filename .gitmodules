@@ -1,0 +1,4 @@
+[submodule "wazuh"]
+	path = wazuh
+	url = http://gitlab.dev.candradimuka/itsecasia/wazuh-scripts.git
+	branch = master
